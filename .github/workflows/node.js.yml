@@ -35,11 +35,11 @@ jobs:
     - name: Copy release file
       run: |
         mkdir release
-        cp -r build/* release
+        robocopy /E build release
     - name: Zip result
       uses: vimtor/action-zip@v1
       with:
-          files: release/
+          files: release\
           dest:  renpy-resources-viewer.zip
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2

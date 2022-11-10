@@ -32,10 +32,14 @@ jobs:
       run: npm run lint
     - name: build electron application for production
       run: npm run build
+    - name: Copy release file
+      run: |
+        mkdir release
+        cp -r build/* release
     - name: Zip result
       uses: vimtor/action-zip@v1
       with:
-          files: build/
+          files: release/
           dest:  renpy-resources-viewer.zip
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2

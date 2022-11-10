@@ -1,0 +1,48 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '2.7'
+    - name: install dependencies
+      run: npm install
+    - name: lint all JS/Vue component files in `src/`
+      run: npm run lint
+    - name: build electron application for production
+      run: npm run build
+    - name: Zip result
+      uses: vimtor/action-zip@v1
+      with:
+          files: build/
+          dest:  renpy-resources-viewer.zip
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: renpy-resources-viewer.zip
+        asset_name: renpy-resources-viewer.zip
+        tag: Latest
+        overwrite: true
+        body: "new release"
